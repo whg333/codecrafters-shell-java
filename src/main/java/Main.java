@@ -64,7 +64,7 @@ public class Main {
                 }
             }else{ // 解析参数
                 if(c == ' '){
-                    if(inQuotes){
+                    if(inDQuotes || inQuotes){
                         sb.append(c);
                     }else{
                         if(sb.length() > 0){
