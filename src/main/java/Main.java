@@ -34,7 +34,7 @@ public class Main {
         // PATH.add(Path.of("/usr/bin"));
         // PATH.add(Path.of("/usr/local/bin"));
         PATH.addAll(pathList);
-        println(String.valueOf(PATH));
+        // println(String.valueOf(PATH));
     }
 
     private static void eval(String input){
@@ -123,7 +123,7 @@ public class Main {
                             }
                         }
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        // e.printStackTrace();
                     }
                 }
                 if(!found){
