@@ -2,13 +2,32 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] args) {
-        // Uncomment this block to pass the first stage
-        print("$ ");
+    private static final Scanner scanner = new Scanner(System.in);
 
-        Scanner scanner = new Scanner(System.in);
-        String input = scanner.nextLine();
-        println("%s: not found", input);
+    public static void main(String[] args) {
+        String input = readInput();
+        do {
+            eval(input);
+            input = readInput();
+        } while(input != null && !"quit".equalsIgnoreCase(input));
+    }
+
+    private static void eval(String input){
+        String cmd = parseCmd(input);
+        println("%s: command not found", cmd);
+    }
+
+    private static String parseCmd(String input) {
+        return input;
+    }
+
+    private static String readInput(){
+        print("$ ");
+        try{
+            return scanner.nextLine();
+        }catch(IllegalStateException e){
+            return null;
+        }
     }
 
     private static void print(String msg){
