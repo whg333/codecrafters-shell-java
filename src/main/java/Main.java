@@ -56,14 +56,14 @@ public class Main {
         int length = input.length();
         for(int i=0;i<length;i++){
             char c = input.charAt(i);
-            if(args.isEmpty()){ // 解析命令
-                if(c != ' '){
-                    sb.append(c);
-                }else{
-                    args.add(sb.toString());
-                    sb.setLength(0);
-                }
-            }else{ // 解析参数
+            // if(args.isEmpty()){ // 解析命令
+            //     if(c != ' '){
+            //         sb.append(c);
+            //     }else{
+            //         args.add(sb.toString());
+            //         sb.setLength(0);
+            //     }
+            // }else{ // 解析参数
                 if(c == '\\'){
                     if(inDQuotes || inQuotes){
                         if(inDQuotes){
@@ -121,7 +121,7 @@ public class Main {
                 }else{
                     sb.append(c);
                 }
-            }
+            // }
 
         }
         if(sb.length() > 0){ // 如果最后还有字符未处理则直接加入
