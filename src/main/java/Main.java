@@ -193,12 +193,36 @@ public class Main {
         @Override
         public void eval(Cmd cmd) {
             String firstArg = cmd.args[0];
-            Path path = Paths.get(firstArg);
-            if(path.toFile().exists()){
-                WORK_DIR = path.toAbsolutePath();
-                // println("cd "+ WORK_DIR);
+            char firstChar = firstArg.charAt(0);
+            boolean isAbsolute = firstChar != '.' && firstChar != '~';
+            if(isAbsolute){
+                Path path = Paths.get(firstArg);
+                changedWorkDir(path);
             }else{
-                println("cd: %s: No such file or directory", path.toAbsolutePath());
+                String twoStr = firstArg.substring(0, 2);
+                if("./".equals(twoStr)){ // 当前目录
+                    firstArg = firstArg.substring(2);
+                    Path path = Paths.get(WORK_DIR.toAbsolutePath().toString(), firstArg);
+                    changedWorkDir(path);
+                }else{
+                    String threeStr = firstArg.substring(0, 3);
+                    while("../".equals(threeStr)){ // 循环一步步处理上级目录
+                        Path parentPath = WORK_DIR.getParent();
+                        if(parentPath != null){
+                            changedWorkDir(parentPath);
+                        }else{
+                            println("cd: %s: No such file or directory", firstArg);
+                            return;
+                        }
+                        firstArg = firstArg.substring(3);
+                        if(firstArg.length() == 0){
+                            return;
+                        }
+                        threeStr = firstArg.substring(0, Math.min(3, firstArg.length()));
+                    }
+                    Path path = Paths.get(WORK_DIR.toAbsolutePath().toString(), firstArg);
+                    changedWorkDir(path);
+                }
             }
         }
     }
@@ -225,6 +249,15 @@ public class Main {
             return null;
         }
         return null;
+    }
+
+    private static void changedWorkDir(Path path){
+        if(path.toFile().exists()){
+            WORK_DIR = path.toAbsolutePath();
+            // println("cd "+ WORK_DIR);
+        }else{
+            println("cd: %s: No such file or directory", path.toAbsolutePath());
+        }
     }
 
     private static String readInput(){
