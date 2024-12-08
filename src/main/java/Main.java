@@ -9,12 +9,18 @@ public class Main {
         do {
             eval(input);
             input = readInput();
-        } while(input != null && !"quit".equalsIgnoreCase(input));
+        } while(input != null);
     }
 
     private static void eval(String input){
         String cmd = parseCmd(input);
-        println("%s: command not found", cmd);
+        switch(cmd){
+            case "exit 0":
+                System.exit(0);
+                break;
+            default:
+                println("%s: command not found", cmd);
+        }
     }
 
     private static String parseCmd(String input) {
