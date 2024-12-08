@@ -49,13 +49,17 @@ public class Main {
 
     private static Cmd parseCmd(String input) {
         String[] strArr = input.split(" ");
-        return new Cmd(strArr[0], Arrays.copyOfRange(strArr, 1, strArr.length));
+        List<String> args = new ArrayList<>(strArr.length-1);
+        for(int i=1;i<strArr.length;i++){
+            args.add(strArr[i].replaceAll("'", ""));
+        }
+        return new Cmd(strArr[0], args);
     }
 
     private static class Cmd{
         final String cmd;
-        final String[] args;
-        public Cmd(String cmd, String[] args) {
+        final List<String> args;
+        public Cmd(String cmd, List<String> args) {
             this.cmd = cmd;
             this.args = args;
         }
@@ -68,6 +72,7 @@ public class Main {
         type(TypeCmd.INSTANCE),
         pwd(PwdCmd.INSTANCE),
         cd(CdCmd.INSTANCE),
+        cat(CatCmd.INSTANCE),
         ;
 
         final CmdHandler handler;
@@ -108,7 +113,7 @@ public class Main {
         private TypeCmd(){}
         @Override
         public void eval(Cmd cmd) {
-            String firstArg = cmd.args[0];
+            String firstArg = cmd.args.get(0);
             if(cmdMap.containsKey(firstArg)){
                 println("%s is a shell builtin", firstArg);
             }else{
@@ -140,7 +145,7 @@ public class Main {
 
                     List<String> commandWithArgs = new ArrayList<>(); // 创建参数列表
                     commandWithArgs.add(filePath.toString());
-                    commandWithArgs.addAll(Arrays.asList(cmd.args));
+                    commandWithArgs.addAll(cmd.args);
 
                     ProcessBuilder processBuilder = new ProcessBuilder(commandWithArgs);
                     processBuilder.redirectErrorStream(true); // 合并标准错误和标准输出
@@ -192,7 +197,7 @@ public class Main {
         private CdCmd(){}
         @Override
         public void eval(Cmd cmd) {
-            String firstArg = cmd.args[0];
+            String firstArg = cmd.args.get(0);
             char firstChar = firstArg.charAt(0);
             boolean isAbsolute = firstChar != '.' && firstChar != '~';
             if(isAbsolute){
@@ -231,6 +236,23 @@ public class Main {
                 }
 
             }
+        }
+    }
+    private static class CatCmd implements CmdHandler{
+        static CmdHandler INSTANCE = new CatCmd();
+        private CatCmd(){}
+        @Override
+        public void eval(Cmd cmd) {
+            List<String> contents = new ArrayList<>(cmd.args.size());
+            for(String arg: cmd.args){
+                try {
+                    String content = Files.readString(Path.of(arg));
+                    contents.add(content);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            println(String.join(" ", contents));
         }
     }
     private static class UnknownCmd implements CmdHandler{
