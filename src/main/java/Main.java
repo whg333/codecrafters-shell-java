@@ -1,11 +1,14 @@
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Main {
 
     private static final Scanner scanner = new Scanner(System.in);
+    private static final List<Path> PATH = new ArrayList<>();
 
     private static final Map<String, CmdHandler> cmdMap = new HashMap<>(){
         {
@@ -16,11 +19,23 @@ public class Main {
     };
 
     public static void main(String[] args) {
+        parseArgs(args);
         String input = readInput();
         do {
             eval(input);
             input = readInput();
         } while(input != null);
+    }
+
+    private static void parseArgs(String[] args){
+        if(args.length < 1){
+            return;
+        }
+        println(String.valueOf(Arrays.asList(args)));
+        List<Path> pathList = Arrays.stream(args[0].split("=")[1].split(":"))
+                .map(Path::of).collect(Collectors.toList());
+        PATH.addAll(pathList);
+        println(String.valueOf(PATH));
     }
 
     private static void eval(String input){
@@ -92,7 +107,29 @@ public class Main {
             if(cmdMap.containsKey(firstArg)){
                 println("%s is a shell builtin", firstArg);
             }else{
-                println("%s: not found", firstArg);
+                boolean found = false;
+                for(Path path: PATH){
+                    if(found){
+                        break;
+                    }
+                    try (Stream<Path> paths = Files.walk(path)) {
+                        List<Path> filePaths = paths.filter(Files::isRegularFile).collect(Collectors.toList());
+                        for(Path filePath: filePaths){
+                            String fileName = filePath.getFileName().toString();
+                            System.out.println(fileName+", "+firstArg);
+                            if(fileName.equals(firstArg)){
+                                println("%s is %s", firstArg, filePath);
+                                found = true;
+                                break;
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if(!found){
+                    println("%s: not found", firstArg);
+                }
             }
         }
     }
