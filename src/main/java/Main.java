@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
@@ -13,18 +14,32 @@ public class Main {
     }
 
     private static void eval(String input){
-        String cmd = parseCmd(input);
-        switch(cmd){
-            case "exit 0":
+        Cmd cmd = parseCmd(input);
+        String command = cmd.cmd;
+        switch(command){
+            case "exit":
                 System.exit(0);
                 break;
+            case "echo":
+                println(String.join(" ", cmd.args));
+                break;
             default:
-                println("%s: command not found", cmd);
+                println("%s: command not found", command);
         }
     }
 
-    private static String parseCmd(String input) {
-        return input;
+    private static Cmd parseCmd(String input) {
+        String[] strArr = input.split(" ");
+        return new Cmd(strArr[0], Arrays.copyOfRange(strArr, 1, strArr.length));
+    }
+
+    private static class Cmd{
+        final String cmd;
+        final String args[];
+        public Cmd(String cmd, String[] args) {
+            this.cmd = cmd;
+            this.args = args;
+        }
     }
 
     private static String readInput(){
