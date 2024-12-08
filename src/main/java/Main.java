@@ -198,7 +198,7 @@ public class Main {
                 WORK_DIR = path.toAbsolutePath();
                 // println("cd "+ WORK_DIR);
             }else{
-                println("cd %s: No such file or directory", path.toAbsolutePath());
+                println("cd: %s: No such file or directory", path.toAbsolutePath());
             }
         }
     }
