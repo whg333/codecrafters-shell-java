@@ -194,8 +194,12 @@ public class Main {
         public void eval(Cmd cmd) {
             String firstArg = cmd.args[0];
             Path path = Paths.get(firstArg);
-            WORK_DIR = path.toAbsolutePath();
-            // println("cd "+ WORK_DIR);
+            if(path.toFile().exists()){
+                WORK_DIR = path.toAbsolutePath();
+                // println("cd "+ WORK_DIR);
+            }else{
+                println("cd %s: No such file or directory", path.toAbsolutePath());
+            }
         }
     }
     private static class UnknownCmd implements CmdHandler{
