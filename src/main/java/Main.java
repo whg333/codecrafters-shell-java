@@ -48,15 +48,52 @@ public class Main {
     }
 
     private static Cmd parseCmd(String input) {
-        String[] strArr = input.split(" ");
-        List<String> args = new ArrayList<>(strArr.length-1);
-        for(int i=1;i<strArr.length;i++){
-            if(strArr[i].length() == 0){
-                continue;
+        List<String> args = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        boolean inQuotes = false;
+        int length = input.length();
+        for(int i=0;i<length;i++){
+            char c = input.charAt(i);
+            if(args.isEmpty()){ // 解析命令
+                if(c != ' '){
+                    sb.append(c);
+                }else{
+                    args.add(sb.toString());
+                    sb.setLength(0);
+                }
+            }else{ // 解析参数
+                if(c == ' '){
+                    if(inQuotes){
+                        sb.append(c);
+                    }else{
+                        if(sb.length() > 0){
+                            args.add(sb.toString());
+                            sb.setLength(0);
+                        }
+                        continue;
+                    }
+                }else if(c == '\''){
+                    if(!inQuotes){
+                        inQuotes = true;
+                    }else{
+                        inQuotes = false;
+                        args.add(sb.toString());
+                        sb.setLength(0);
+                    }
+                }else{
+                    sb.append(c);
+                }
             }
-            args.add(strArr[i].replaceAll("'", ""));
+
+            if(i == length-1){
+                if(sb.length() > 0){
+                    args.add(sb.toString());
+                    sb.setLength(0);
+                }
+            }
         }
-        return new Cmd(strArr[0], args);
+
+        return new Cmd(args.get(0), args.subList(1, args.size()));
     }
 
     private static class Cmd{
