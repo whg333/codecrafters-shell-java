@@ -53,6 +53,7 @@ public class Main {
         boolean inQuotes = false; // 是否进入单引号
         boolean inDQuotes = false; // 是否进入双引号
         boolean inSDQuotes = false; // 是否进入\"特殊双引号
+
         int length = input.length();
         for(int i=0;i<length;i++){
             char c = input.charAt(i);
@@ -79,8 +80,7 @@ public class Main {
                     sb.append(c);
                 }else{
                     if(sb.length() > 0){
-                        args.add(sb.toString());
-                        sb.setLength(0);
+                        addSbToArgs(sb, args);
                     }
                 }
             }else if(c == '\''){
@@ -91,11 +91,9 @@ public class Main {
                         inQuotes = true;
                     }else{
                         inQuotes = false;
-                        args.add(sb.toString());
-                        sb.setLength(0);
+                        addSbToArgs(sb, args);
                     }
                 }
-
             }else if(c == '"'){
                 if(inQuotes){
                     sb.append(c);
@@ -105,22 +103,25 @@ public class Main {
                     }else{
                         if(!inSDQuotes){
                             inDQuotes = false;
-                            args.add(sb.toString());
-                            sb.setLength(0);
+                            addSbToArgs(sb, args);
                         }
                     }
                 }
             }else{
                 sb.append(c);
             }
-
         }
+
         if(sb.length() > 0){ // 如果最后还有字符未处理则直接加入
-            args.add(sb.toString());
-            sb.setLength(0);
+            addSbToArgs(sb, args);
         }
 
         return new Cmd(args.get(0), args.subList(1, args.size()));
+    }
+
+    private static void addSbToArgs(StringBuilder sb, List<String> args){
+        args.add(sb.toString());
+        sb.setLength(0);
     }
 
     private static class Cmd{
