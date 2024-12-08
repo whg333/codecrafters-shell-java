@@ -292,7 +292,7 @@ public class Main {
                     e.printStackTrace();
                 }
             }
-            println(String.join("", contents));
+            print(String.join("", contents));
         }
     }
     private static class UnknownCmd implements CmdHandler{
