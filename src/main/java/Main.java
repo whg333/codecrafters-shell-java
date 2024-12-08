@@ -66,11 +66,15 @@ public class Main {
             }else{ // 解析参数
                 if(c == '\\'){
                     if(inDQuotes || inQuotes){
-                        char nc = input.charAt(i+1);
-                        if(nc == '\\' || nc == '$' || nc == '"'){
-                            i++;
-                            sb.append(nc);
-                            inSDQuotes = true;
+                        if(inDQuotes){
+                            char nc = input.charAt(i+1);
+                            if(nc == '\\' || nc == '$' || nc == '"'){
+                                i++;
+                                sb.append(nc);
+                                inSDQuotes = true;
+                            }else{
+                                sb.append(c);
+                            }
                         }else{
                             sb.append(c);
                         }
