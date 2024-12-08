@@ -65,7 +65,13 @@ public class Main {
             }else{ // 解析参数
                 if(c == '\\'){
                     if(inDQuotes || inQuotes){
-                        sb.append(c);
+                        char nc = input.charAt(i+1);
+                        if(nc == '\\' || nc == '$' || nc == '"'){
+                            i++;
+                            sb.append(nc);
+                        }else{
+                            sb.append(c);
+                        }
                     }else{
                         c = input.charAt(++i);
                         sb.append(c);
@@ -78,7 +84,6 @@ public class Main {
                             args.add(sb.toString());
                             sb.setLength(0);
                         }
-                        continue;
                     }
                 }else if(c == '\''){
                     if(inDQuotes){
@@ -110,12 +115,10 @@ public class Main {
                 }
             }
 
-            if(i == length-1){
-                if(sb.length() > 0){ // 如果最后还有字符未处理则直接加入
-                    args.add(sb.toString());
-                    sb.setLength(0);
-                }
-            }
+        }
+        if(sb.length() > 0){ // 如果最后还有字符未处理则直接加入
+            args.add(sb.toString());
+            sb.setLength(0);
         }
 
         return new Cmd(args.get(0), args.subList(1, args.size()));
