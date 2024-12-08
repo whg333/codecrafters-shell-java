@@ -199,30 +199,37 @@ public class Main {
                 Path path = Paths.get(firstArg);
                 changedWorkDir(path);
             }else{
-                String twoStr = firstArg.substring(0, 2);
-                if("./".equals(twoStr)){ // 当前目录
-                    firstArg = firstArg.substring(2);
-                    Path path = Paths.get(WORK_DIR.toAbsolutePath().toString(), firstArg);
+                if(firstChar == '~'){
+                    String home = System.getenv("HOME");
+                    Path path = Paths.get(home);
                     changedWorkDir(path);
                 }else{
-                    String threeStr = firstArg.substring(0, 3);
-                    while("../".equals(threeStr)){ // 循环一步步处理上级目录
-                        Path parentPath = WORK_DIR.getParent();
-                        if(parentPath != null){
-                            changedWorkDir(parentPath);
-                        }else{
-                            println("cd: %s: No such file or directory", firstArg);
-                            return;
+                    String twoStr = firstArg.substring(0, 2);
+                    if("./".equals(twoStr)){ // 当前目录
+                        firstArg = firstArg.substring(2);
+                        Path path = Paths.get(WORK_DIR.toAbsolutePath().toString(), firstArg);
+                        changedWorkDir(path);
+                    }else{
+                        String threeStr = firstArg.substring(0, 3);
+                        while("../".equals(threeStr)){ // 循环一步步处理上级目录
+                            Path parentPath = WORK_DIR.getParent();
+                            if(parentPath != null){
+                                changedWorkDir(parentPath);
+                            }else{
+                                println("cd: %s: No such file or directory", firstArg);
+                                return;
+                            }
+                            firstArg = firstArg.substring(3);
+                            if(firstArg.length() == 0){
+                                return;
+                            }
+                            threeStr = firstArg.substring(0, Math.min(3, firstArg.length()));
                         }
-                        firstArg = firstArg.substring(3);
-                        if(firstArg.length() == 0){
-                            return;
-                        }
-                        threeStr = firstArg.substring(0, Math.min(3, firstArg.length()));
+                        Path path = Paths.get(WORK_DIR.toAbsolutePath().toString(), firstArg);
+                        changedWorkDir(path);
                     }
-                    Path path = Paths.get(WORK_DIR.toAbsolutePath().toString(), firstArg);
-                    changedWorkDir(path);
                 }
+
             }
         }
     }
