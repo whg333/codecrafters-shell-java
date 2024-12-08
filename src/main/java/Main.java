@@ -8,7 +8,7 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
         String input = scanner.nextLine();
-        println("%s: node found", input);
+        println("%s: not found", input);
     }
 
     private static void print(String msg){
