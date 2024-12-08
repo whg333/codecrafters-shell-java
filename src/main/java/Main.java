@@ -51,6 +51,9 @@ public class Main {
         String[] strArr = input.split(" ");
         List<String> args = new ArrayList<>(strArr.length-1);
         for(int i=1;i<strArr.length;i++){
+            if(strArr[i].length() == 0){
+                continue;
+            }
             args.add(strArr[i].replaceAll("'", ""));
         }
         return new Cmd(strArr[0], args);
