@@ -1,5 +1,7 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -39,7 +41,7 @@ public class Main {
 
     private static void eval(String input){
         Cmd cmd = parseCmd(input);
-        CmdHandler handler = cmdMap.getOrDefault(cmd.cmd, UnknownCmd.INSTANCE);
+        CmdHandler handler = cmdMap.getOrDefault(cmd.cmd, ProgramCmd.INSTANCE);
         handler.eval(cmd);
     }
 
@@ -108,27 +110,63 @@ public class Main {
             }else{
                 boolean found = false;
                 for(Path path: PATH){
-                    if(found){
+                    Path filePath = findFilePath(firstArg, path);
+                    if(filePath != null){
+                        println("%s is %s", firstArg, filePath);
+                        found = true;
                         break;
-                    }
-                    try (Stream<Path> paths = Files.walk(path)) {
-                        List<Path> filePaths = paths.filter(Files::isRegularFile).collect(Collectors.toList());
-                        for(Path filePath: filePaths){
-                            String fileName = filePath.getFileName().toString();
-                            // System.out.println(fileName+", "+firstArg);
-                            if(fileName.equals(firstArg)){
-                                println("%s is %s", firstArg, filePath);
-                                found = true;
-                                break;
-                            }
-                        }
-                    } catch (IOException e) {
-                        // e.printStackTrace();
                     }
                 }
                 if(!found){
                     println("%s: not found", firstArg);
                 }
+            }
+        }
+    }
+    private static class ProgramCmd implements CmdHandler{
+        static CmdHandler INSTANCE = new ProgramCmd();
+        private ProgramCmd(){}
+        @Override
+        public void eval(Cmd cmd) {
+            String program = cmd.cmd;
+            boolean found = false;
+            for(Path path: PATH){
+                Path filePath = findFilePath(program, path);
+                if(filePath != null){
+
+                    // 创建参数列表
+                    List<String> commandWithArgs = new ArrayList<>();
+                    commandWithArgs.add(filePath.toString());
+                    commandWithArgs.addAll(Arrays.asList(cmd.args));
+
+                    ProcessBuilder processBuilder = new ProcessBuilder(commandWithArgs);
+                    processBuilder.redirectErrorStream(true); // 合并标准错误和标准输出
+
+                    try {
+                        Process process = processBuilder.start();
+
+                        // 读取输出
+                        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                println(line);
+                            }
+                        }
+
+                        // 等待进程结束并获取退出值
+                        // int exitCode = process.waitFor();
+                        // System.out.println("Exited with code: " + exitCode);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    found = true;
+                    break;
+                }
+            }
+            if(!found){
+                println("%s: not found", program);
             }
         }
     }
@@ -139,6 +177,22 @@ public class Main {
         public void eval(Cmd cmd) {
             println("%s: command not found", cmd.cmd);
         }
+    }
+
+    private static Path findFilePath(String firstArg, Path path){
+        try (Stream<Path> paths = Files.walk(path)) {
+            List<Path> filePaths = paths.filter(Files::isRegularFile).collect(Collectors.toList());
+            for(Path filePath: filePaths){
+                String fileName = filePath.getFileName().toString();
+                // System.out.println(fileName+", "+firstArg);
+                if(fileName.equals(firstArg)){
+                    return filePath;
+                }
+            }
+        } catch (IOException e) {
+            return null;
+        }
+        return null;
     }
 
     private static String readInput(){
