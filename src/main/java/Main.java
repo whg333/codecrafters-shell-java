@@ -1,9 +1,19 @@
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
 
     private static final Scanner scanner = new Scanner(System.in);
+
+    private static final Map<String, CmdHandler> cmdMap = new HashMap<>(){
+        {
+            for(CmdType cmdType: CmdType.values()){
+                put(cmdType.name(), cmdType.handler);
+            }
+        }
+    };
 
     public static void main(String[] args) {
         String input = readInput();
@@ -15,17 +25,8 @@ public class Main {
 
     private static void eval(String input){
         Cmd cmd = parseCmd(input);
-        String command = cmd.cmd;
-        switch(command){
-            case "exit":
-                System.exit(0);
-                break;
-            case "echo":
-                println(String.join(" ", cmd.args));
-                break;
-            default:
-                println("%s: command not found", command);
-        }
+        CmdHandler handler = cmdMap.getOrDefault(cmd.cmd, UnknownCmd.INSTANCE);
+        handler.eval(cmd);
     }
 
     private static Cmd parseCmd(String input) {
@@ -35,10 +36,72 @@ public class Main {
 
     private static class Cmd{
         final String cmd;
-        final String args[];
+        final String[] args;
         public Cmd(String cmd, String[] args) {
             this.cmd = cmd;
             this.args = args;
+        }
+    }
+
+    private enum CmdType{
+
+        exit(ExitCmd.INSTANCE),
+        echo(EchoCmd.INSTANCE),
+        type(TypeCmd.INSTANCE),
+        ;
+
+        final CmdHandler handler;
+        CmdType(CmdHandler handler){
+            this.handler = handler;
+        }
+        public static CmdType typeOf(String cmd){
+            for(CmdType cmdType: values()){
+                if(cmd.equals(cmdType.name())){
+                    return cmdType;
+                }
+            }
+            throw new IllegalArgumentException("Unknown command: "+cmd);
+        }
+    }
+
+    private interface CmdHandler{
+        void eval(Cmd cmd);
+    }
+    private static class ExitCmd implements CmdHandler{
+        static CmdHandler INSTANCE = new ExitCmd();
+        private ExitCmd(){}
+        @Override
+        public void eval(Cmd cmd) {
+            System.exit(0);
+        }
+    }
+    private static class EchoCmd implements CmdHandler{
+        static CmdHandler INSTANCE = new EchoCmd();
+        private EchoCmd(){}
+        @Override
+        public void eval(Cmd cmd) {
+            println(String.join(" ", cmd.args));
+        }
+    }
+    private static class TypeCmd implements CmdHandler{
+        static CmdHandler INSTANCE = new TypeCmd();
+        private TypeCmd(){}
+        @Override
+        public void eval(Cmd cmd) {
+            String firstArg = cmd.args[0];
+            if(cmdMap.containsKey(firstArg)){
+                println("%s is a shell builtin", firstArg);
+            }else{
+                println("%s: not found", firstArg);
+            }
+        }
+    }
+    private static class UnknownCmd implements CmdHandler{
+        static CmdHandler INSTANCE = new UnknownCmd();
+        private UnknownCmd(){}
+        @Override
+        public void eval(Cmd cmd) {
+            println("%s: command not found", cmd.cmd);
         }
     }
 
