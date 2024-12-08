@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -64,6 +65,7 @@ public class Main {
         exit(ExitCmd.INSTANCE),
         echo(EchoCmd.INSTANCE),
         type(TypeCmd.INSTANCE),
+        pwd(PwdCmd.INSTANCE),
         ;
 
         final CmdHandler handler;
@@ -134,8 +136,7 @@ public class Main {
                 Path filePath = findFilePath(program, path);
                 if(filePath != null){
 
-                    // 创建参数列表
-                    List<String> commandWithArgs = new ArrayList<>();
+                    List<String> commandWithArgs = new ArrayList<>(); // 创建参数列表
                     commandWithArgs.add(filePath.toString());
                     commandWithArgs.addAll(Arrays.asList(cmd.args));
 
@@ -168,6 +169,15 @@ public class Main {
             if(!found){
                 println("%s: not found", program);
             }
+        }
+    }
+    private static class PwdCmd implements CmdHandler{
+        static CmdHandler INSTANCE = new PwdCmd();
+        private PwdCmd(){}
+        @Override
+        public void eval(Cmd cmd) {
+            String curPath = Main.class.getResource("").getPath();
+            println(curPath);
         }
     }
     private static class UnknownCmd implements CmdHandler{
