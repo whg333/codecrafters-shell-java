@@ -13,6 +13,7 @@ public class Main {
 
     private static final Scanner scanner = new Scanner(System.in);
     private static final List<Path> PATH = new ArrayList<>();
+    private static Path WORK_DIR;
 
     private static final Map<String, CmdHandler> cmdMap = new HashMap<>(){
         {
@@ -66,6 +67,7 @@ public class Main {
         echo(EchoCmd.INSTANCE),
         type(TypeCmd.INSTANCE),
         pwd(PwdCmd.INSTANCE),
+        cd(CdCmd.INSTANCE),
         ;
 
         final CmdHandler handler;
@@ -176,8 +178,24 @@ public class Main {
         private PwdCmd(){}
         @Override
         public void eval(Cmd cmd) {
-            String curPath = System.getProperty("user.dir");
-            println(curPath);
+            // String curDir = System.getProperty("user.dir");
+            // println(curDir);
+            if(WORK_DIR == null){
+                Path curPath = Paths.get("");
+                WORK_DIR = curPath.toAbsolutePath();
+            }
+            println(String.valueOf(WORK_DIR));
+        }
+    }
+    private static class CdCmd implements CmdHandler{
+        static CmdHandler INSTANCE = new CdCmd();
+        private CdCmd(){}
+        @Override
+        public void eval(Cmd cmd) {
+            String firstArg = cmd.args[0];
+            Path path = Paths.get(firstArg);
+            WORK_DIR = path.toAbsolutePath();
+            // println("cd "+ WORK_DIR);
         }
     }
     private static class UnknownCmd implements CmdHandler{
