@@ -56,72 +56,63 @@ public class Main {
         int length = input.length();
         for(int i=0;i<length;i++){
             char c = input.charAt(i);
-            // if(args.isEmpty()){ // 解析命令
-            //     if(c != ' '){
-            //         sb.append(c);
-            //     }else{
-            //         args.add(sb.toString());
-            //         sb.setLength(0);
-            //     }
-            // }else{ // 解析参数
-                if(c == '\\'){
-                    if(inDQuotes || inQuotes){
-                        if(inDQuotes){
-                            char nc = input.charAt(i+1);
-                            if(nc == '\\' || nc == '$' || nc == '"'){
-                                i++;
-                                sb.append(nc);
-                                inSDQuotes = true;
-                            }else{
-                                sb.append(c);
-                            }
+            if(c == '\\'){
+                if(inDQuotes || inQuotes){
+                    if(inDQuotes){
+                        char nc = input.charAt(i+1);
+                        if(nc == '\\' || nc == '$' || nc == '"'){
+                            i++;
+                            sb.append(nc);
+                            inSDQuotes = true;
                         }else{
                             sb.append(c);
                         }
                     }else{
-                        c = input.charAt(++i);
                         sb.append(c);
-                    }
-                }else if(c == ' '){
-                    if(inDQuotes || inQuotes){
-                        sb.append(c);
-                    }else{
-                        if(sb.length() > 0){
-                            args.add(sb.toString());
-                            sb.setLength(0);
-                        }
-                    }
-                }else if(c == '\''){
-                    if(inDQuotes){
-                        sb.append(c);
-                    }else{
-                        if(!inQuotes){
-                            inQuotes = true;
-                        }else{
-                            inQuotes = false;
-                            args.add(sb.toString());
-                            sb.setLength(0);
-                        }
-                    }
-
-                }else if(c == '"'){
-                    if(inQuotes){
-                        sb.append(c);
-                    }else{
-                        if(!inDQuotes){
-                            inDQuotes = true;
-                        }else{
-                            if(!inSDQuotes){
-                                inDQuotes = false;
-                                args.add(sb.toString());
-                                sb.setLength(0);
-                            }
-                        }
                     }
                 }else{
+                    c = input.charAt(++i);
                     sb.append(c);
                 }
-            // }
+            }else if(c == ' '){
+                if(inDQuotes || inQuotes){
+                    sb.append(c);
+                }else{
+                    if(sb.length() > 0){
+                        args.add(sb.toString());
+                        sb.setLength(0);
+                    }
+                }
+            }else if(c == '\''){
+                if(inDQuotes){
+                    sb.append(c);
+                }else{
+                    if(!inQuotes){
+                        inQuotes = true;
+                    }else{
+                        inQuotes = false;
+                        args.add(sb.toString());
+                        sb.setLength(0);
+                    }
+                }
+
+            }else if(c == '"'){
+                if(inQuotes){
+                    sb.append(c);
+                }else{
+                    if(!inDQuotes){
+                        inDQuotes = true;
+                    }else{
+                        if(!inSDQuotes){
+                            inDQuotes = false;
+                            args.add(sb.toString());
+                            sb.setLength(0);
+                        }
+                    }
+                }
+            }else{
+                sb.append(c);
+            }
 
         }
         if(sb.length() > 0){ // 如果最后还有字符未处理则直接加入
