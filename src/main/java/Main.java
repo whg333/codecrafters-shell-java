@@ -94,12 +94,16 @@ public class Main {
                     }
 
                 }else if(c == '"'){
-                    if(!inDQuotes){
-                        inDQuotes = true;
+                    if(inQuotes){
+                        sb.append(c);
                     }else{
-                        inDQuotes = false;
-                        args.add(sb.toString());
-                        sb.setLength(0);
+                        if(!inDQuotes){
+                            inDQuotes = true;
+                        }else{
+                            inDQuotes = false;
+                            args.add(sb.toString());
+                            sb.setLength(0);
+                        }
                     }
                 }else{
                     sb.append(c);
