@@ -176,8 +176,9 @@ public class Main {
         private PwdCmd(){}
         @Override
         public void eval(Cmd cmd) {
-            String curPath = Main.class.getResource("").getPath();
-            println(curPath);
+            String path = Main.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+            File curPath = new File(path).getParentFile();
+            println(curPath.getAbsolutePath());
         }
     }
     private static class UnknownCmd implements CmdHandler{
