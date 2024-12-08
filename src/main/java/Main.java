@@ -50,8 +50,8 @@ public class Main {
     private static Cmd parseCmd(String input) {
         List<String> args = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        boolean inQuotes = false;
-        boolean inDQuotes = false;
+        boolean inQuotes = false; // 是否进入单引号
+        boolean inDQuotes = false; // 是否进入双引号
         int length = input.length();
         for(int i=0;i<length;i++){
             char c = input.charAt(i);
@@ -63,7 +63,14 @@ public class Main {
                     sb.setLength(0);
                 }
             }else{ // 解析参数
-                if(c == ' '){
+                if(c == '\\'){
+                    if(inDQuotes || inQuotes){
+                        sb.append(c);
+                    }else{
+                        c = input.charAt(++i);
+                        sb.append(c);
+                    }
+                }else if(c == ' '){
                     if(inDQuotes || inQuotes){
                         sb.append(c);
                     }else{
@@ -100,7 +107,7 @@ public class Main {
             }
 
             if(i == length-1){
-                if(sb.length() > 0){
+                if(sb.length() > 0){ // 如果最后还有字符未处理则直接加入
                     args.add(sb.toString());
                     sb.setLength(0);
                 }
