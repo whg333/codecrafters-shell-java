@@ -115,7 +115,7 @@ public class Main {
                         List<Path> filePaths = paths.filter(Files::isRegularFile).collect(Collectors.toList());
                         for(Path filePath: filePaths){
                             String fileName = filePath.getFileName().toString();
-                            System.out.println(fileName+", "+firstArg);
+                            // System.out.println(fileName+", "+firstArg);
                             if(fileName.equals(firstArg)){
                                 println("%s is %s", firstArg, filePath);
                                 found = true;
