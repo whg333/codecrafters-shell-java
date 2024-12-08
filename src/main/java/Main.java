@@ -52,6 +52,7 @@ public class Main {
         StringBuilder sb = new StringBuilder();
         boolean inQuotes = false; // 是否进入单引号
         boolean inDQuotes = false; // 是否进入双引号
+        boolean inSDQuotes = false; // 是否进入\"特殊双引号
         int length = input.length();
         for(int i=0;i<length;i++){
             char c = input.charAt(i);
@@ -69,6 +70,7 @@ public class Main {
                         if(nc == '\\' || nc == '$' || nc == '"'){
                             i++;
                             sb.append(nc);
+                            inSDQuotes = true;
                         }else{
                             sb.append(c);
                         }
@@ -105,9 +107,11 @@ public class Main {
                         if(!inDQuotes){
                             inDQuotes = true;
                         }else{
-                            inDQuotes = false;
-                            args.add(sb.toString());
-                            sb.setLength(0);
+                            if(!inSDQuotes){
+                                inDQuotes = false;
+                                args.add(sb.toString());
+                                sb.setLength(0);
+                            }
                         }
                     }
                 }else{
