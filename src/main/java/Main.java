@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,7 +20,7 @@ public class Main {
     };
 
     public static void main(String[] args) {
-        parseArgs(args);
+        parseSysPath(args);
         String input = readInput();
         do {
             eval(input);
@@ -27,13 +28,11 @@ public class Main {
         } while(input != null);
     }
 
-    private static void parseArgs(String[] args){
-        if(args.length < 1){
-            return;
-        }
-        println(String.valueOf(Arrays.asList(args)));
-        List<Path> pathList = Arrays.stream(args[0].split("=")[1].split(":"))
-                .map(Path::of).collect(Collectors.toList());
+    private static void parseSysPath(String[] args){
+        String path = System.getenv("PATH");
+        List<Path> pathList = Arrays.stream(path.split(File.pathSeparator)).map(Path::of).collect(Collectors.toList());
+        // PATH.add(Path.of("/usr/bin"));
+        // PATH.add(Path.of("/usr/local/bin"));
         PATH.addAll(pathList);
         println(String.valueOf(PATH));
     }
