@@ -51,6 +51,7 @@ public class Main {
         List<String> args = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         boolean inQuotes = false;
+        boolean inDQuotes = false;
         int length = input.length();
         for(int i=0;i<length;i++){
             char c = input.charAt(i);
@@ -73,10 +74,23 @@ public class Main {
                         continue;
                     }
                 }else if(c == '\''){
-                    if(!inQuotes){
-                        inQuotes = true;
+                    if(inDQuotes){
+                        sb.append(c);
                     }else{
-                        inQuotes = false;
+                        if(!inQuotes){
+                            inQuotes = true;
+                        }else{
+                            inQuotes = false;
+                            args.add(sb.toString());
+                            sb.setLength(0);
+                        }
+                    }
+
+                }else if(c == '"'){
+                    if(!inDQuotes){
+                        inDQuotes = true;
+                    }else{
+                        inDQuotes = false;
                         args.add(sb.toString());
                         sb.setLength(0);
                     }
