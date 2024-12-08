@@ -112,7 +112,7 @@ public class Main {
         type(TypeCmd.INSTANCE),
         pwd(PwdCmd.INSTANCE),
         cd(CdCmd.INSTANCE),
-        cat(CatCmd.INSTANCE),
+        // cat(CatCmd.INSTANCE),
         ;
 
         final CmdHandler handler;
